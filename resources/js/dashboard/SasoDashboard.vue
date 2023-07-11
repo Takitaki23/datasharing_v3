@@ -74,6 +74,7 @@ const EditStudentInfo = defineAsyncComponent(() =>
 
 export default {
     setup() {
+        
         // Get the router instance
         const router = useRouter();
 
@@ -157,7 +158,6 @@ export default {
         0 12px 20px rgba(0, 0, 0, 0.1), 0 24px 40px rgba(0, 0, 0, 0.1);
     height: 100%;
     padding: 0.5rem;
-    overflow-y: auto;
 }
 .sidebar-nav {
     list-style: none;
@@ -196,6 +196,7 @@ export default {
 .fa-users,
 .fa-users-cog,
 .fa-id-badge,
+.fa-id-card,
 .fa-file-alt {
     margin-right: 10px;
     font-size: 1.2rem;

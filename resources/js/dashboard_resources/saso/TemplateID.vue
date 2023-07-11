@@ -1,6 +1,6 @@
 <template>
-    <div class="main-container">
-        <div class="dashboard_header" style="margin-left: 13rem">
+    <div class="main-container" style="height: 650px; overflow: scroll;">
+        <div class="dashboard_header" style="width: 80%; margin: auto;">
             <h1 class="fw-bold">Template ID</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
@@ -11,10 +11,25 @@
                 </ol>
             </nav>
         </div>
-        <div
+        <div class="upload_files">
+                <div class="upload-container">
+                    <label for="formFile" class="form-label">Upload ID Template</label>
+                    <input class="form-control short-input" type="file" id="formFile" multiple @change="handleFileUpload">
+                </div>
+                <div class="uploaded_files" v-if="uploadedFiles.length > 0" style="width:70%; margin: auto; margin-top: 1rem;">
+                    <div class="uploaded_file" v-for="(file, index) in uploadedFiles" :key="index">
+                        <img :src="file.url" :alt="'Uploaded ID Template ' + (index + 1)">
+                    </div>
+                </div>
+        </div>
+     
+        <div class="scroll-container">
+            <div
             class="row justify-content-center table-main"
-            style="width: 90%; margin-left: 15%"
-        >
+            style="width: 90%; margin-left: 15%;
+            "
+           
+            >
             <div class="col-md-12">
                 <!-- {{ imageTemplates }} -->
                 <div class="image-gallery">
@@ -33,7 +48,7 @@
                 </div>
 
                 <div class="row mt-3">
-                    <h1 class="text-success">ikaw na maglagay title dito!</h1>
+                    <h3 class="text-success">Edit Template</h3>
                     <!-- <div class="col-md-4 border">
                         <canvas
                             v-for="(content, index) in contents"
@@ -54,6 +69,8 @@
                 </div>
             </div>
         </div>
+        </div>
+       
 
         <button
             type="button"
@@ -84,7 +101,27 @@ import { useToast } from "vue-toast-notification";
 // import collegeb from "../../images/collegeb.png";
 import profile from "../../images/man.png";
 export default {
+    data() {
+    return {
+      uploadedFiles: [],
+    };
+  },
+  methods: {
+    handleFileUpload(event) {
+      const files = event.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileObject = {
+          url: URL.createObjectURL(file),
+          name: file.name,
+        };
+        // Insert the new file at the beginning of the array
+        this.uploadedFiles.unshift(fileObject);
+      }
+    },
+  },
     setup() {
+        
         
         // const tmpID = ref("/id_template/collegef.png");
         // storage for templates
@@ -506,8 +543,9 @@ export default {
 } */
 /* Main container */
 .main-container {
-    width: 90%;
-    margin: auto;
+  width: 80%;
+  margin: auto;
+  padding-top: 1rem;
 }
 /* Design for dashboard header */
 div.dashboard_header {
@@ -598,6 +636,61 @@ div.dashboard_header {
 .table-main {
     margin-top: 5rem;
 }
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+  width: 78%;
+  margin: auto;
+  margin-top: 3rem
+}
+
+.upload-container .form-label {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.short-input {
+  width: 100%;
+}
+
+.upload_section {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  position: relative; /* Add this line */
+}
+
+.upload_container {
+  margin-bottom: 2rem;
+}
+
+.upload_container label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.uploaded_files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.uploaded_file {
+  flex: 0 0 300px;
+}
+
+.uploaded_file img {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 @media screen and (max-width: 1480px) {
     .generate-id-button {
         max-width: 100% !important;
