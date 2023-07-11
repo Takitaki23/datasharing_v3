@@ -101,6 +101,8 @@ import { useToast } from "vue-toast-notification";
 // import collegeb from "../../images/collegeb.png";
 import profile from "../../images/man.png";
 export default {
+
+// For adding new template
     data() {
     return {
       uploadedFiles: [],
@@ -636,6 +638,7 @@ div.dashboard_header {
 .table-main {
     margin-top: 5rem;
 }
+/* For upload new template */
 
 .upload-container {
   display: flex;
@@ -680,7 +683,7 @@ div.dashboard_header {
 }
 
 .uploaded_file {
-  flex: 0 0 300px;
+  flex: 0 0 200px;
 }
 
 .uploaded_file img {
