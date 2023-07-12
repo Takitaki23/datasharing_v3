@@ -1,6 +1,6 @@
 <template>
     <div class="main-container" style="height: 650px; overflow: scroll;">
-        <div class="dashboard_header" style="width: 80%; margin: auto;">
+        <div class="dashboard_header" style="   margin: auto; margin-left: 4rem;">
             <h1 class="fw-bold">Template ID</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
@@ -11,7 +11,7 @@
                 </ol>
             </nav>
         </div>
-        <div class="upload_files">
+        <div class="upload_files mb-5">
                 <div class="upload-container">
                     <label for="formFile" class="form-label">Upload ID Template</label>
                     <input class="form-control short-input" type="file" id="formFile" multiple @change="handleFileUpload">
@@ -22,14 +22,18 @@
                     </div>
                 </div>
         </div>
-     
         <div class="scroll-container">
+            
             <div
             class="row justify-content-center table-main"
-            style="width: 90%; margin-left: 15%;
+            style="width: 90%; margin: auto;
             "
-           
             >
+
+            <div class="">
+              <h3 class="fw-bold">Choose Template</h3>
+            </div>
+
             <div class="col-md-12">
                 <!-- {{ imageTemplates }} -->
                 <div class="image-gallery">
@@ -47,8 +51,8 @@
                     <!-- editor for template -->
                 </div>
 
-                <div class="row mt-3">
-                    <h3 class="text-success">Edit Template</h3>
+                <div class="row mt-4">
+                    <h3 class="text-success fw-bold">Edit Template</h3>
                     <!-- <div class="col-md-4 border">
                         <canvas
                             v-for="(content, index) in contents"
@@ -58,7 +62,7 @@
                             ref="draggableCanvases"
                         ></canvas>
                     </div> -->
-                    <div class="col-md-6 border" style="height: 380px; overflow: hidden;">
+                    <div class="col-md-6 border" style="height: 380px; overflow: hidden; padding: 1rem;">
                         <canvas
                             class=""
                             ref="canvasRef"
@@ -545,8 +549,9 @@ export default {
 } */
 /* Main container */
 .main-container {
-  width: 80%;
+  width: 85%;
   margin: auto;
+  margin-left: 14rem;
   padding-top: 1rem;
 }
 /* Design for dashboard header */
@@ -620,7 +625,6 @@ div.dashboard_header {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 13rem;
     color: white;
     border: none;
     border-radius: 5px;
@@ -656,7 +660,7 @@ div.dashboard_header {
 }
 
 .short-input {
-  width: 100%;
+  width: 50%;
 }
 
 .upload_section {
