@@ -12,15 +12,18 @@
             </nav>
         </div>
         <div class="upload_files mb-5">
-                <div class="upload-container">
-                    <label for="formFile" class="form-label">Upload ID Template</label>
-                    <input class="form-control short-input" type="file" id="formFile" multiple @change="handleFileUpload">
+            <div class="upload-container">
+                <label for="formFile" class="form-label">Upload ID Template</label>
+                <input class="form-control short-input" type="file" id="formFile" multiple @change="handleFileUpload">
+            </div>
+            <div class="uploaded_files" v-if="uploadedFiles.length > 0" style="width:70%; margin: auto; margin-top: 1rem;">
+                <div class="uploaded_file" v-for="(file, index) in uploadedFiles" :key="index">
+                    <img :src="file.url" :alt="'Uploaded ID Template ' + (index + 1)">
+                    <button class="btn btn-danger btn-sm delete-button" @click="removeUploadedFile(index)">
+                        X
+                    </button>
                 </div>
-                <div class="uploaded_files" v-if="uploadedFiles.length > 0" style="width:70%; margin: auto; margin-top: 1rem;">
-                    <div class="uploaded_file" v-for="(file, index) in uploadedFiles" :key="index">
-                        <img :src="file.url" :alt="'Uploaded ID Template ' + (index + 1)">
-                    </div>
-                </div>
+            </div>
         </div>
         <div class="scroll-container">
             
@@ -124,6 +127,9 @@ export default {
         // Insert the new file at the beginning of the array
         this.uploadedFiles.unshift(fileObject);
       }
+    },
+    removeUploadedFile(index) {
+            this.uploadedFiles.splice(index, 1);
     },
   },
     setup() {
@@ -697,7 +703,15 @@ div.dashboard_header {
   padding: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+.uploaded_file {
+    position: relative;
+}
 
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
 @media screen and (max-width: 1480px) {
     .generate-id-button {
         max-width: 100% !important;
