@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('templates', function (Blueprint $table) {
             $table->id();
             $table->string('template_name');
+            $table->string('template_back');
             $table->integer('canvas_width');
             $table->integer('canvas_height');
             $table->integer('profile_x');
@@ -30,6 +31,22 @@ return new class extends Migration
             $table->integer('textContents_3_y');//first name
             $table->integer('textContents_4_x');//middle name
             $table->integer('textContents_4_y');//middle name
+            $table->integer('signature_x');
+            $table->integer('signature_y');
+            $table->integer('textContentsBack_0_x');//contact person
+            $table->integer('textContentsBack_0_y');//contact person
+            $table->integer('textContentsBack_1_x');//address 1
+            $table->integer('textContentsBack_1_y');//address 1
+            $table->integer('textContentsBack_2_x');//contact number
+            $table->integer('textContentsBack_2_y');//contact number
+            $table->integer('textContentsBack_3_x');//semester
+            $table->integer('textContentsBack_3_y');//semester
+
+            $table->string('primary_font');//middle name
+            $table->string('secondary_font');//middle name
+            $table->string('rgb_color_primary');//middle name
+            $table->string('rgb_color_secondary');//middle name
+            $table->string('rgb_color_tertiary');//middle name
             // add more later including the font
             $table->timestamps();
         });

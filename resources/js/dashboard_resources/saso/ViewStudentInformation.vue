@@ -35,6 +35,9 @@
                             ></canvas>
                             <!-- <h5 class="text-success text-center">Preview ID Front</h5> -->
                         </div>
+                        <div class="col-md-6" style="height: 380px;overflow: hidden;">
+                            <canvas class="" ref="canvasBackRef" :width="canvasWidth" :height="canvasHeight"></canvas>
+                        </div>
                         <!-- for back of id -->
                         <!-- <div class="col-sm-6">
               <canvas ref="canvasRef" :width="canvasWidth" :height="canvasHeight"></canvas>
@@ -349,14 +352,7 @@
 <script>
 // import { useToast } from "vue-toastification";
 import axios from "axios";
-import {
-    ref,
-    onMounted,
-    getCurrentInstance,
-    computed,
-    reactive,
-    watch,
-} from "vue";
+import {ref,onMounted,getCurrentInstance,computed,watch} from "vue";
 // import collegef from "../../images/collegef.png";
 // import collegeb from "../../images/collegeb.png";
 import profile from "../../images/man.png";
@@ -380,12 +376,13 @@ export default {
         // accessing public folder in laravel
         const image_src = ref("/id_template/jhsf.png");
         const image_signature = ref("/id_signatures/1685325544.png");
-
+        let signature = ref('/id_signatures/1685325544.png')
         // template coordinates
         const templateCoordinates = ref([]);
         // student id coordinates
         const idCoordinates = ref([]);
         const collegef = ref(null)
+        const collegeb = ref(null)
         // return the id
         const statePath = computed(async () => {
             try {
@@ -408,29 +405,7 @@ export default {
             } catch (error) {
                 console.error(error);
             }
-            // return modalDataValue.state = props.modalData
-
-            // return null;
         });
-
-        // watch(statePath, async (id) => {
-        //   if (id) {
-        //     console.log(id.value)
-        //     // Perform the request or call a function here
-        //     // sendRequest(id.value);
-        //     try {
-        //       console.log('Sending request with path:', id.value);
-        //       const response = await axios.get(`/api/students`);
-        //       users.value = JSON.parse(response.data);
-        //       // map to a data
-        //       console.log(users.value.data.find((item) => item.id === id.value) || null)
-        //       responseData.value = users.value.data.find((item) => item.id === id.value) || null
-        //       console.table(responseData.value)
-        //     } catch (error) {
-        //       console.error(error);
-        //     }
-        //   }
-        // }, { immediate: true });
 
         watch(
             () => props.modalData,
@@ -445,9 +420,11 @@ export default {
 
         // Add a selectedContentIndex reactive variable
         const selectedContentIndex = ref(null);
+        const selectedContentIndexBack = ref(null);
 
         const instance = getCurrentInstance();
         const canvasRef = ref(null);
+        const canvasBackRef = ref(null);
         const canvasWidth = ref(0);
         const canvasHeight = ref(0);
         // we devided by 2 to make it smaller
@@ -456,11 +433,23 @@ export default {
         const profileWidth = ref(352 / 2); // Adjust the width as needed
         const profileHeight = ref(415 / 2); // Adjust the height as needed
 
+        // we devided by 2 to make it smaller
+        const signatureX = ref((240+64.02) ); // Adjust the X coordinate as needed
+        const signatureY = ref(75); // Adjust the Y coordinate as needed
+        const signatureWidth = ref(300/2); // Adjust the width as needed
+        const signatureHeight = ref(150); // Adjust the height as needed
+
         // Drag variables
         var isDragging = ref(false);
         var startX = ref(0);
         var startY = ref(0);
+
+        var isDraggingBack = ref(false);
+        var startXBack = ref(0);
+        var startYBack = ref(0);
         const draggedElement = ref(null);
+        const draggedElementBack = ref(null);
+
 
         watch(statePath, () => {
             console.log(statePath);
@@ -470,7 +459,10 @@ export default {
         // Use a watch property to trigger getIdCoordinates when responseData.value.student_no changes
         watch(() => responseData.value.student_no, (newStudentNo) => {
             console.log(newStudentNo)
-        getIdCoordinates(newStudentNo);
+            getIdCoordinates(newStudentNo);
+            // get active templates from local storage
+            const act_Tmp = localStorage.getItem('active_id')
+            getTemplateCoordinates(act_Tmp);
         });
 
         const textContents = computed(() => {
@@ -536,6 +528,26 @@ export default {
             ];
         });
 
+        // for back contents
+        const textContentsBack = computed(()=>{
+            const ecp = "CONTACT PERSON";
+            const address1 = "#354 QUEZON ST. SAN JOSE BALANGA"
+            // const barangay = "SAN JOSE"
+            // const address2 = "BALANGA BATAAN"
+            // const province = "BATAAN"
+            const ecpc = "09345678986"
+            const semester = "2nd Semester AY 2023 - 2024"
+            return [
+                {content: ecp, x:(idCoordinates.value[0]?.textContentsBack_0_x || 310), y:(idCoordinates.value[0]?.textContentsBack_0_y || 120) / 2,fontSize:30/2},
+                {content: address1, x:(idCoordinates.value[0]?.textContentsBack_1_x || 280),y:(idCoordinates.value[0]?.textContentsBack_1_y ||160)/2,fontSize:22/2},
+                // {content: barangay, x:255,y:0,fontSize:25},
+                // {content: address2, x:255,y:122,fontSize:25/2},
+                // {content: province, x:0,y:0,fontSize:0},
+                {content: ecpc, x:(idCoordinates.value[0]?.textContentsBack_2_x ||340),y:(idCoordinates.value[0]?.textContentsBack_2_y ||200)/2,fontSize:25/2},
+                {content: semester, x:(idCoordinates.value[0]?.textContentsBack_3_x ||35),y:(idCoordinates.value[0]?.textContentsBack_3_y || 500)/2,fontSize:30/2},
+            ]
+        })
+
         const saveImageToLocal = (imageData) => {
             localStorage.setItem("generatedImage", imageData);
             console.log("Image saved to local storage");
@@ -552,7 +564,8 @@ export default {
 
         const updateCanvasSize = () => {
             const canvas = canvasRef.value;
-            if (canvas) {
+            const canvasBack = canvasBackRef.value;
+            if (canvas && canvasBack) {
                 // we devided by 2 to make it smaller
                 canvasWidth.value = canvas.width / 2;
                 canvasHeight.value = canvas.height / 2;
@@ -561,20 +574,37 @@ export default {
         // new redraw
         const redrawCanvas = () => {
             const canvas = canvasRef.value;
-            if (canvas) {
+            const canvasBack = canvasBackRef.value;
+            if (canvas && canvasBack) {
                 const context = canvas.getContext("2d");
+                const contextBack = canvasBack.getContext("2d");
                 // we devided by 2 to make it smaller
                 const canvasWidth = canvas.width / 2;
                 const canvasHeight = canvas.height / 2;
+                // back
                 const offscreenCanvas = document.createElement("canvas");
                 const offscreenContext = offscreenCanvas.getContext("2d");
 
-                // Set offscreen canvas size
+                // back
+                const offscreenCanvasBack = document.createElement("canvas");
+                const offscreenContextBack = offscreenCanvas.getContext("2d");
+                
+                // Set offscreen canvas size 
                 offscreenCanvas.width = canvasWidth;
                 offscreenCanvas.height = canvasHeight;
 
+                // second canvas
+                offscreenCanvasBack.width = canvasWidth;
+                offscreenCanvasBack.height = canvasHeight;
+               
                 // Clear the offscreen canvas
                 offscreenContext.clearRect(0, 0, canvasWidth, canvasHeight);
+
+                // Clear the offscreen canvas2
+                offscreenContextBack.clearRect(0, 0, canvasWidth, canvasHeight);
+
+                // draw the back
+                const backTemplateImage = new Image();
 
                 // Draw the template image
                 const templateImage = new Image();
@@ -625,12 +655,7 @@ export default {
                         // Draw the text elements
                         textContents.value.forEach((textContent, index) => {
                             offscreenContext.font = `${textContent.fontSize}px ${textContent.fonts}`;
-                            // offscreenContext.font = textContent.font;
                             offscreenContext.fillStyle = textContent.colors;
-                            // context.fillStyle =
-                            //     index === selectedContentIndex.value
-                            //         ? "red"
-                            //         : "black"; // Apply selection style
                             offscreenContext.fillText(
                                 textContent.content,
                                 textContent.x,
@@ -641,65 +666,73 @@ export default {
                         // Copy the offscreen canvas to the visible canvas
                         context.clearRect(0, 0, canvasWidth, canvasHeight);
                         context.drawImage(offscreenCanvas, 0, 0);
+
+                        backTemplateImage.src = collegeb.value
+                        backTemplateImage.onload = () => {
+                            const backTemplateAspectRatio = backTemplateImage.width / backTemplateImage.height;
+                            const canvasAspectRatio = canvasWidth / canvasHeight;
+
+                            let backDrawWidth, backDrawHeight;
+                            let backOffsetX = 0, backOffsetY = 0;
+
+                            if (backTemplateAspectRatio > canvasAspectRatio) {
+                                // Back template image is wider than the canvas
+                                backDrawWidth = canvasWidth;
+                                backDrawHeight = backDrawWidth / backTemplateAspectRatio;
+                                backOffsetY = (canvasHeight - backDrawHeight) / 2;
+                            } else {
+                                // Back template image is taller than the canvas
+                                backDrawHeight = canvasHeight;
+                                backDrawWidth = backDrawHeight * backTemplateAspectRatio;
+                                backOffsetX = (canvasWidth - backDrawWidth) / 2;
+                                // backOffsetX = 0;
+                            }
+
+                            // Draw the back template image on the second canvas
+                            offscreenContextBack.drawImage(
+                                backTemplateImage,
+                                backOffsetX,
+                                backOffsetY,
+                                backDrawWidth,
+                                backDrawHeight
+                            );
+
+                             // Draw the profile image
+                            const signatureImage = new Image();
+                            signatureImage.src = signature.value
+                            signatureImage.onload = () => {
+                                offscreenContextBack.drawImage(
+                                    signatureImage,
+                                    signatureX.value,
+                                    signatureY.value,
+                                    signatureWidth.value,
+                                    signatureHeight.value
+                                );
+
+                                // Draw the text elements
+                                if (textContentsBack.value) {
+                                    textContentsBack.value.forEach((textContent, index) => {
+                                        // console.log(textContent.content)
+                                        offscreenContextBack.font = `${textContent.fontSize}px Arial`;
+                                        contextBack.fillStyle = "black"; // Apply selection style
+                                        offscreenContextBack.fillText(
+                                        textContent.content,
+                                        textContent.x,
+                                        textContent.y
+                                        );
+                                    });
+                                }
+                                contextBack.clearRect(0, 0, canvasWidth, canvasHeight);
+                                contextBack.drawImage(offscreenCanvas, 0, 0);
+                            }
+                            
+                        
+                            // ...
+                        };
                     };
                 };
             }
         };
-
-        // const redrawCanvas = () => {
-        //     const canvas = canvasRef.value;
-        //     if (canvas) {
-        //       const context = canvas.getContext('2d');
-
-        //       // added mew
-        //       const canvasWidth = canvas.width;
-        //       const canvasHeight = canvas.height;
-
-        //       // Clear the canvas
-        //       context.clearRect(0, 0, canvasWidth, canvasHeight);
-
-        //       // Draw the template image
-        //       const templateImage = new Image();
-        //       templateImage.src = collegef;
-        //       templateImage.onload = () => {
-        //         const templateAspectRatio = templateImage.width / templateImage.height;
-        //         const canvasAspectRatio = canvas.width / canvas.height;
-
-        //         let drawWidth, drawHeight;
-        //         let offsetX = 0, offsetY = 0;
-
-        //         if (templateAspectRatio > canvasAspectRatio) {
-        //           // Template image is wider than the canvas
-        //           drawWidth = canvas.width;
-        //           drawHeight = drawWidth / templateAspectRatio;
-        //           offsetY = (canvas.height - drawHeight) / 2;
-        //         } else {
-        //           // Template image is taller than the canvas
-        //           drawHeight = canvas.height;
-        //           drawWidth = drawHeight * templateAspectRatio;
-        //           offsetX = (canvas.width - drawWidth) / 2;
-        //         }
-
-        //         // Draw the template image scaled to fit the canvas
-        //         context.drawImage(templateImage, offsetX, offsetY, drawWidth, drawHeight);
-
-        //         // Draw the profile image
-        //         const profileImage = new Image();
-        //         profileImage.src = profile;
-        //         profileImage.onload = () => {
-        //           context.drawImage(profileImage, profileX.value, profileY.value, profileWidth.value, profileHeight.value);
-
-        //           // Draw the text elements
-        //           textContents.value.forEach((textContent) => {
-        //             console.log(textContent)
-        //             context.font = `${textContent.fontSize}px Arial`;
-        //             context.fillStyle = 'black';
-        //             context.fillText(textContent.content, textContent.x, textContent.y);
-        //           });
-        //         };
-        //       };
-        //     }
-        // };
 
         const getContentPositions = () => {
             const positions = {};
@@ -718,6 +751,14 @@ export default {
                 height: profileHeight.value * 2,
             };
 
+            // Add signature position
+            positions.signature = {
+                x: signatureX.value,
+                y: signatureY.value,
+                with: signatureWidth.value,
+                height: signatureHeight.value,
+            }
+
             // Add text elements positions
             positions.textContents = textContents.value.map(
                 (textContent, index) => ({
@@ -729,8 +770,19 @@ export default {
                 })
             );
 
+            positions.textContentsBack = textContentsBack.value.map(
+                (textContentBack, index) => ({
+                    id: index,
+                    content: textContentBack.content,
+                    x: textContentBack.x,
+                    y: textContentBack.y * 2,
+                    fontSize: textContentBack.fontSize * 2,
+                })
+            )
+
             positions.templates = {
-                template: collegef.value
+                template: collegef.value,
+                templateBack: collegeb.value
             }
 
             return positions;
@@ -777,6 +829,7 @@ export default {
         };
 
         const handleMouseDown = (event) => {
+            // front
             const rect = canvasRef.value.getBoundingClientRect();
             const offsetX = event.clientX - rect.left;
             const offsetY = event.clientY - rect.top;
@@ -812,6 +865,45 @@ export default {
 
                     startX.value = offsetX;
                     startY.value = offsetY;
+                    break;
+                }
+            }
+
+            // Check if the mouse is within the signature image on the back canvas
+            const rectBack = canvasBackRef.value.getBoundingClientRect();
+            const offsetXBack = event.clientX - rectBack.left;
+            const offsetYBack = event.clientY - rectBack.top;
+
+            if (
+                offsetXBack >= signatureX.value &&
+                offsetXBack <= signatureX.value + signatureWidth.value &&
+                offsetYBack >= signatureY.value &&
+                offsetYBack <= signatureY.value + signatureHeight.value
+            ) {
+                isDraggingBack.value = true;
+                draggedElementBack.value = "image";
+
+                startXBack.value = offsetXBack;
+                startYBack.value = offsetYBack;
+            }
+
+            // Check if the mouse is within any text element on the back canvas
+            for (let i = 0; i < textContentsBack.value.length; i++) {
+                const textContentBack = textContentsBack.value[i];
+                if (
+                    offsetXBack >= textContentBack.x &&
+                    offsetXBack <= textContentBack.x + 200 && // Assuming a maximum width of 200 for text elements
+                    offsetYBack >= textContentBack.y - textContentBack.fontSize &&
+                    offsetYBack <= textContentBack.y
+                ) {
+                    isDraggingBack.value = true;
+                    draggedElementBack.value = i;
+
+                    // Set the selected content index
+                    selectedContentIndexBack.value = i;
+
+                    startXBack.value = offsetXBack;
+                    startYBack.value = offsetYBack;
                     break;
                 }
             }
@@ -864,6 +956,51 @@ export default {
                     redrawCanvas();
                 }
             }
+
+            if (isDraggingBack.value) {
+                const mouseXBack =
+                    event.clientX - canvasBackRef.value.getBoundingClientRect().left;
+                const mouseYBack =
+                    event.clientY - canvasBackRef.value.getBoundingClientRect().top;
+                const diffXBack = mouseXBack - startXBack.value;
+                const diffYBack = mouseYBack - startYBack.value;
+
+                if (draggedElementBack.value === "image") {
+                    // Update the profile image position on the back canvas
+                    signatureX.value += diffXBack;
+                    signatureY.value += diffYBack;
+                } else if (typeof draggedElementBack.value === "number") {
+                    // Update the text position on the back canvas
+                    const draggedTextContentBack = textContentsBack.value[draggedElementBack.value];
+                    draggedTextContentBack.x += diffXBack;
+                    draggedTextContentBack.y += diffYBack;
+
+                    // Check if the text element is outside the back canvas
+                    const canvasWidthBack = canvasBackRef.value.width;
+                    const canvasHeightBack = canvasBackRef.value.height;
+                    const textWidthBack = 200; // Assuming a maximum width of 200 for text elements
+
+                    if (draggedTextContentBack.x < 0) {
+                        draggedTextContentBack.x = 0;
+                    } else if (draggedTextContentBack.x + textWidthBack > canvasWidthBack) {
+                        draggedTextContentBack.x = canvasWidthBack - textWidthBack;
+                    }
+
+                    if (draggedTextContentBack.y < 0) {
+                        draggedTextContentBack.y = 0;
+                    } else if (draggedTextContentBack.y > canvasHeightBack) {
+                        draggedTextContentBack.y = canvasHeightBack;
+                    }
+                }
+
+                startXBack.value = mouseXBack;
+                startYBack.value = mouseYBack;
+
+                // Redraw the back canvas only when necessary
+                if (diffXBack !== 0 || diffYBack !== 0) {
+                    redrawCanvas();
+                }
+            }
         };
 
         const handleMouseUp = () => {
@@ -871,19 +1008,25 @@ export default {
             draggedElement.value = null;
             // new added
             selectedContentIndex.value = null; // Clear the selected content index
+
+            isDraggingBack.value = false;
+            draggedElementBack.value = null;
+            selectedContentIndexBack.value = null; // Clear the selected content index for the back canvas
         };
 
          // get template contents coordinates
-         const getTemplateCoordinates = async(st_id_no) => {
+         const getTemplateCoordinates = async(src) => {
             try {
-                const response = await axios.get("/api/image-templates-coord");
+                const activeTemplate = {activeTemplate:src} 
+                const response = await axios.get("/api/image-templates-coord",{params: activeTemplate});
                 templateCoordinates.value = response.data;
                 // profileX.value = templateCoordinates.value[0].profile_x / 2
                 // profileY.value = templateCoordinates.value[0].profile_y / 2
 
                 // template name
                 collegef.value = templateCoordinates.value[0].template_name
-
+                collegeb.value = templateCoordinates.value[0].template_back
+                
                 console.log(templateCoordinates.value);
             } catch (error) {
                 console.error(error);
@@ -901,6 +1044,9 @@ export default {
                     .then((res)=>{
                         console.log(res.data)
                         idCoordinates.value = res.data
+
+                        signatureX.value = idCoordinates.value[0]?.signature_x || (240+64.02)
+                        signatureY.value = idCoordinates.value[0]?.signature_y || 75
                     })
                     .catch((err)=>{
                         console.log(err)
@@ -913,7 +1059,9 @@ export default {
             }
         }
         onMounted(() => {
-            getTemplateCoordinates()
+            // active template
+            const active_Tmp =localStorage.getItem('active_id')
+            getTemplateCoordinates(active_Tmp)
             // getIdCoordinates()
             const canvas = canvasRef.value;
             if (canvas) {
@@ -921,6 +1069,18 @@ export default {
                 canvas.addEventListener("mousemove", handleMouseMove);
                 canvas.addEventListener("mouseup", handleMouseUp);
                 canvas.addEventListener("mouseleave", handleMouseUp);
+                redrawCanvas();
+
+                // Update canvas size after mounted
+                updateCanvasSize();
+            }
+
+            const canvasBack = canvasBackRef.value;
+            if (canvasBack) {
+                canvasBack.addEventListener("mousedown", handleMouseDown);
+                canvasBack.addEventListener("mousemove", handleMouseMove);
+                canvasBack.addEventListener("mouseup", handleMouseUp);
+                canvasBack.addEventListener("mouseleave", handleMouseUp);
                 redrawCanvas();
 
                 // Update canvas size after mounted
@@ -950,6 +1110,7 @@ export default {
             handleExportButtonClick,
             saveCanvasAsImage,
             canvasRef,
+            canvasBackRef,
             canvasWidth: 1011,
             canvasHeight: 638,
             statePath,

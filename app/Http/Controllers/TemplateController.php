@@ -19,7 +19,11 @@ class TemplateController extends Controller
         // dd($imageFiles);
         $imageNames = [];
         foreach ($imageFiles as $imageFile) {
-            $imageNames[] = basename($imageFile);
+            $imageName = basename($imageFile);
+            // Check if the image name contains "f" before the file extension
+            if (strpos($imageName, 'f.') !== false) {
+                $imageNames[] = $imageName;
+            }
         }
         return response()->json($imageNames);
     }
@@ -30,6 +34,7 @@ class TemplateController extends Controller
         // dd($request);
         if($alreadySaveT){
             $alreadySaveT->template_name = $request->templates['template'];
+            $alreadySaveT->template_back = $request->templates['templateBack'];
             // canvas
             $alreadySaveT->canvas_width = $request->canvas['width'];
             $alreadySaveT->canvas_height = $request->canvas['height'];
@@ -51,11 +56,39 @@ class TemplateController extends Controller
             // contents middlename
             $alreadySaveT->textContents_4_x = $request->textContents[4]['x'];
             $alreadySaveT->textContents_4_y = $request->textContents[4]['y'];
+
+            // back coordinates
+            // signature
+            $alreadySaveT->signature_x = $request->signature['x'];
+            $alreadySaveT->signature_y = $request->signature['y'];
+            // contents contact person
+            $alreadySaveT->textContentsBack_0_x = $request->textContentsBack[0]['x'];
+            $alreadySaveT->textContentsBack_0_y = $request->textContentsBack[0]['y'];
+            // contents address 1
+            $alreadySaveT->textContentsBack_1_x = $request->textContentsBack[1]['x'];
+            $alreadySaveT->textContentsBack_1_y = $request->textContentsBack[1]['y'];
+            // contents contact
+            $alreadySaveT->textContentsBack_2_x = $request->textContentsBack[2]['x'];
+            $alreadySaveT->textContentsBack_2_y = $request->textContentsBack[2]['y'];
+            // contents semester
+            $alreadySaveT->textContentsBack_3_x = $request->textContentsBack[3]['x'];
+            $alreadySaveT->textContentsBack_3_y = $request->textContentsBack[3]['y'];
+            // font used
+            $alreadySaveT->primary_font = 'id_fonts\Helvetica.ttf';
+            $alreadySaveT->secondary_font = 'id_fonts\Helvetica-Bold.ttf';
+            // color used
+            $alreadySaveT->rgb_color_primary = '0,0,0';
+            $alreadySaveT->rgb_color_secondary = '0,100,0';
+            $alreadySaveT->rgb_color_tertiary = '50,50,50';
+            // contents middlename
+            // $alreadySaveT->textContentsBack_4_x = $request->textContentsBack[4]['x'];
+            // $alreadySaveT->textContentsBack_4_y = $request->textContentsBack[4]['y'];
             $alreadySaveT->save();
             return response()->json(['message' => 'Template Updated successfully']);
         }else{
             $template = new Template();
             $template->template_name = $request->templates['template'];
+            $template->template_back = '/id_template/collegeb.png';
             // canvas
             $template->canvas_width = $request->canvas['width'];
             $template->canvas_height = $request->canvas['height'];
@@ -77,15 +110,42 @@ class TemplateController extends Controller
             // contents middlename
             $template->textContents_4_x = $request->textContents[4]['x'];
             $template->textContents_4_y = $request->textContents[4]['y'];
+
+            // back coordinates
+            // signature
+            $template->signature_x = $request->signature['x'];
+            $template->signature_y = $request->signature['y'];
+            // contents contact person
+            $template->textContentsBack_0_x = $request->textContentsBack[0]['x'];
+            $template->textContentsBack_0_y = $request->textContentsBack[0]['y'];
+            // contents address 1
+            $template->textContentsBack_1_x = $request->textContentsBack[1]['x'];
+            $template->textContentsBack_1_y = $request->textContentsBack[1]['y'];
+            // contents contact
+            $template->textContentsBack_2_x = $request->textContentsBack[2]['x'];
+            $template->textContentsBack_2_y = $request->textContentsBack[2]['y'];
+            // contents semester
+            $template->textContentsBack_3_x = $request->textContentsBack[3]['x'];
+            $template->textContentsBack_3_y = $request->textContentsBack[3]['y'];
+
+            // font used
+            $template->primary_font = 'id_fonts\Helvetica.ttf';
+            $template->secondary_font = 'id_fonts\Helvetica-Bold.ttf';
+            // color used
+            $template->rgb_color_primary = '0,0,0';
+            $template->rgb_color_secondary = '0,100,0';
+            $template->rgb_color_tertiary = '50,50,50';
             $template->save();
             return response()->json(['message' => 'Template saved successfully']);
         }
     }
 
     // get the template coordinates
-    public function getTemplateCoordinates(){
+    public function getTemplateCoordinates(Request $request){
+        // dd($request->get('activeTemplate'));
         // just for now
-        $tmpCoordinates = Template::get();
+        // if get its a object then if its first array
+        $tmpCoordinates = Template::where('template_name',$request->get('activeTemplate'))->get();
         return response()->json($tmpCoordinates);
     }
 }

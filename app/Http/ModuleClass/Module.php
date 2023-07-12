@@ -112,7 +112,8 @@ use Illuminate\Routing\Controller;
             $sig = public_path("id_signatures/1685325544.png");
             $type = "3";
 
-            $im = imagecreatefrompng(public_path("id_template/collegef.png"));
+            // template
+            $im = imagecreatefrompng(public_path($data->templates['template']));
             $back = imagecreatefrompng(public_path("id_template/collegeb.png"));
          
             $box = new Box($im);
@@ -265,6 +266,23 @@ use Illuminate\Routing\Controller;
                 // contents middlename
                 $alreadySaveID->textContents_4_x = $data->textContents[4]['x'];
                 $alreadySaveID->textContents_4_y = $data->textContents[4]['y'];
+
+                // back coordinates
+                // signature
+                $alreadySaveID->signature_x = $data->signature['x'];
+                $alreadySaveID->signature_y = $data->signature['y'];
+                // contents contact person
+                $alreadySaveID->textContentsBack_0_x = $data->textContentsBack[0]['x'];
+                $alreadySaveID->textContentsBack_0_y = $data->textContentsBack[0]['y'];
+                // contents address 1
+                $alreadySaveID->textContentsBack_1_x = $data->textContentsBack[1]['x'];
+                $alreadySaveID->textContentsBack_1_y = $data->textContentsBack[1]['y'];
+                // contents contact
+                $alreadySaveID->textContentsBack_2_x = $data->textContentsBack[2]['x'];
+                $alreadySaveID->textContentsBack_2_y = $data->textContentsBack[2]['y'];
+                // contents semester
+                $alreadySaveID->textContentsBack_3_x = $data->textContentsBack[3]['x'];
+                $alreadySaveID->textContentsBack_3_y = $data->textContentsBack[3]['y'];
                 $alreadySaveID->save();
                 // return response()->json(['message' => 'Template Updated successfully']);
             }else{
@@ -300,6 +318,23 @@ use Illuminate\Routing\Controller;
                 $template->rgb_color_primary = '0,0,0';
                 $template->rgb_color_secondary = '0,100,0';
                 $template->rgb_color_tertiary = '50,50,50';
+
+                // back coordinates
+                // signature
+                $template->signature_x = $data->signature['x'];
+                $template->signature_y = $data->signature['y'];
+                // contents contact person
+                $template->textContentsBack_0_x = $data->textContentsBack[0]['x'];
+                $template->textContentsBack_0_y = $data->textContentsBack[0]['y'];
+                // contents address 1
+                $template->textContentsBack_1_x = $data->textContentsBack[1]['x'];
+                $template->textContentsBack_1_y = $data->textContentsBack[1]['y'];
+                // contents contact
+                $template->textContentsBack_2_x = $data->textContentsBack[2]['x'];
+                $template->textContentsBack_2_y = $data->textContentsBack[2]['y'];
+                // contents semester
+                $template->textContentsBack_3_x = $data->textContentsBack[3]['x'];
+                $template->textContentsBack_3_y = $data->textContentsBack[3]['y'];
                 $template->save();
                 // return response()->json(['message' => 'Template saved successfully']);
             }
