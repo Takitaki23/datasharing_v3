@@ -280,8 +280,7 @@
                         <div class="mb-3">
                             <br>
                             <label for="col-form-label" class="fw-bold">Highest Educational Attainment: </label>
-                            <select id="" class="form-select">
-                                <option value="">N/A</option>
+                            <select id="father_highest_attainment_select" class="form-select mb-3" @change="toggleFatherAttainment">
                                 <option value="">Elementary Graduate</option>
                                 <option value="">Highschool Graduate</option>
                                 <option value="">Elementary Undergraduate</option>
@@ -290,8 +289,10 @@
                                 <option value="">College Undergraduate</option>
                                 <option value="">Technical Vocational</option>
                                 <option value="">Post Graduate (Masters or Doctorate degree)</option>
+                                <option value="father_highest_attainment_option">Others, please specify</option>
                             </select>
-                        </div>
+                            <input type="text" id="" v-if="show_father_attainment" v-model="father_highest_attainment" class="form-control" placeholder="Please specify">
+                          </div>
                     </div>  
                 </div>
       </div>
@@ -358,8 +359,7 @@
                         <div class="mb-3">
                             <br>
                             <label for="col-form-label" class="fw-bold">Highest Educational Attainment: </label>
-                            <select id="" class="form-select">
-                                <option value="">N/A</option>
+                            <select id="mother_highest_attainment_select" class="form-select mb-3" @change="toggleMotherAttainment">
                                 <option value="">Elementary Graduate</option>
                                 <option value="">Highschool Graduate</option>
                                 <option value="">Elementary Undergraduate</option>
@@ -368,7 +368,9 @@
                                 <option value="">College Undergraduate</option>
                                 <option value="">Technical Vocational</option>
                                 <option value="">Post Graduate (Masters or Doctorate degree)</option>
+                                <option value="mother_highest_attainment_option">Others, please specify</option>
                             </select>
+                            <input type="text" id="" v-if="show_mother_attainment" v-model="mother_highest_attainment" class="form-control" placeholder="Please specify">
                         </div>
                     </div>  
                 </div>
@@ -876,10 +878,17 @@ export default {
       showEpcst: false,
       epcst_reason: '',
       
-
       // What other school do you consider?
       show_school_consider:false,
       school_consider: '',
+
+      // father highest educational attainment
+      show_father_attainment:false,
+      father_highest_attainment: '',
+
+      // mother highest educational attainment
+      show_mother_attainment:false,
+      mother_highest_attainment: '',
 
     };
   },
@@ -898,6 +907,16 @@ export default {
     // What other school do you consider?
     toggleSchoolConsider() {
       this.show_school_consider = document.getElementById("why_school_consider_select").value === "why_school_consider_option";
+    },
+
+    // father highest educational attainment
+    toggleFatherAttainment(){
+      this.show_father_attainment = document.getElementById("father_highest_attainment_select").value === "father_highest_attainment_option";
+    },
+    
+    // mother highest educational attainment
+    toggleMotherAttainment(){
+      this.show_mother_attainment = document.getElementById("mother_highest_attainment_select").value === "mother_highest_attainment_option";
     },
     previousStep() {
       this.step--;
