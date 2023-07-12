@@ -1,6 +1,6 @@
 <template>
     <div class="main-container" style="height: 650px; overflow: scroll;">
-        <div class="dashboard_header" style="width: 80%; margin: auto;">
+        <div class="dashboard_header" style="   margin: auto; margin-left: 4rem;">
             <h1 class="fw-bold">Template ID</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
@@ -11,25 +11,32 @@
                 </ol>
             </nav>
         </div>
-        <div class="upload_files">
-                <div class="upload-container">
-                    <label for="formFile" class="form-label">Upload ID Template</label>
-                    <input class="form-control short-input" type="file" id="formFile" multiple @change="handleFileUpload">
+        <div class="upload_files mb-5">
+            <div class="upload-container">
+                <label for="formFile" class="form-label">Upload ID Template</label>
+                <input class="form-control short-input" type="file" id="formFile" multiple @change="handleFileUpload">
+            </div>
+            <div class="uploaded_files" v-if="uploadedFiles.length > 0" style="width:70%; margin: auto; margin-top: 1rem;">
+                <div class="uploaded_file" v-for="(file, index) in uploadedFiles" :key="index">
+                    <img :src="file.url" :alt="'Uploaded ID Template ' + (index + 1)">
+                    <button class="btn btn-danger btn-sm delete-button" @click="removeUploadedFile(index)">
+                        X
+                    </button>
                 </div>
-                <div class="uploaded_files" v-if="uploadedFiles.length > 0" style="width:70%; margin: auto; margin-top: 1rem;">
-                    <div class="uploaded_file" v-for="(file, index) in uploadedFiles" :key="index">
-                        <img :src="file.url" :alt="'Uploaded ID Template ' + (index + 1)">
-                    </div>
-                </div>
+            </div>
         </div>
-     
         <div class="scroll-container">
+            
             <div
             class="row justify-content-center table-main"
-            style="width: 90%; margin-left: 15%;
+            style="width: 90%; margin: auto;
             "
-           
             >
+
+            <div class="">
+              <h3 class="fw-bold">Choose Template</h3>
+            </div>
+
             <div class="col-md-12">
                 <!-- {{ imageTemplates }} -->
                 <div class="image-gallery">
@@ -47,8 +54,8 @@
                     <!-- editor for template -->
                 </div>
 
-                <div class="row mt-3">
-                    <h3 class="text-success">Edit Template</h3>
+                <div class="row mt-4">
+                    <h3 class="text-success fw-bold">Edit Template</h3>
                     <!-- <div class="col-md-4 border">
                         <canvas
                             v-for="(content, index) in contents"
@@ -58,7 +65,7 @@
                             ref="draggableCanvases"
                         ></canvas>
                     </div> -->
-                    <div class="col-md-6" style="height: 380px; overflow: hidden;">
+                    <div class="col-md-6 border" style="height: 380px; overflow: hidden; padding: 1rem;">
                         <canvas
                             class=""
                             ref="canvasRef"
@@ -66,11 +73,6 @@
                             :height="canvasHeight"
                         ></canvas>
                     </div>
-                    
-                    <div class="col-md-6" style="height: 380px;overflow: hidden;">
-                        <canvas class="" ref="canvasBackRef" :width="canvasWidth" :height="canvasHeight"></canvas>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -105,7 +107,6 @@ import { useToast } from "vue-toast-notification";
 // import collegef from "../../images/collegef.png";
 // import collegeb from "../../images/collegeb.png";
 import profile from "../../images/man.png";
-// import signature from "../../images/man.png";
 export default {
 
 // For adding new template
@@ -127,6 +128,9 @@ export default {
         this.uploadedFiles.unshift(fileObject);
       }
     },
+    removeUploadedFile(index) {
+            this.uploadedFiles.splice(index, 1);
+    },
   },
     setup() {
         
@@ -138,24 +142,16 @@ export default {
 
         // college front
         let collegef = ref('/id_template/collegef.png')
-        let collegeb = ref('/id_template/collegeb.png')
-
-        let signature = ref('/id_signatures/1685325544.png')
 
         // Create a hidden canvas for double buffering
         const hiddenCanvas = document.createElement("canvas");
-        // const hiddenContext = hiddenCanvas.getContext("2d");
-
-        const hiddenCanvasBack = document.createElement("canvas");
-        // const hiddenContextBack = hiddenCanvasBack.getContext("2d");
+        const hiddenContext = hiddenCanvas.getContext("2d");
 
         // Add a selectedContentIndex reactive variable
         const selectedContentIndex = ref(null);
-        const selectedContentIndexBack = ref(null);
 
-        // const instance = getCurrentInstance();
+        const instance = getCurrentInstance();
         const canvasRef = ref(null);
-        const canvasBackRef = ref(null);
         const canvasWidth = ref(0);
         const canvasHeight = ref(0);
         // we devided by 2 to make it smaller
@@ -163,38 +159,32 @@ export default {
         const profileY = ref(87 / 2); // Adjust the Y coordinate as needed
         const profileWidth = ref(352 / 2); // Adjust the width as needed
         const profileHeight = ref(415 / 2); // Adjust the height as needed
-        // we devided by 2 to make it smaller
-        const signatureX = ref((240+64.02) ); // Adjust the X coordinate as needed
-        const signatureY = ref(75); // Adjust the Y coordinate as needed
-        const signatureWidth = ref(300/2); // Adjust the width as needed
-        const signatureHeight = ref(150); // Adjust the height as needed
 
         // Drag variables
         var isDragging = ref(false);
         var startX = ref(0);
         var startY = ref(0);
-        var isDraggingBack = ref(false);
-        var startXBack = ref(0);
-        var startYBack = ref(0);
         const draggedElement = ref(null);
-        const draggedElementBack = ref(null);
 
         // watch(statePath, () => {
         //     console.log(statePath);
         //     redrawCanvas();
         // });
 
-        // for front contents
         const textContents = computed(() => {
             // Retrieve the template coordinates from the reactive value
             // const resolvedCoordinates = templateCoordinates.value;
             // console.log(templateCoordinates.value[0].profile_x)
             // console.log(responseData.value.student_no);
+
+           
+
             const st_id_s = "20-1234";
+
             const course_s = "BS. INFORMATION TECHNOLOGY";
             const last_name = "Eastwoods";
             const first_name = "Professional";
-            const middle_name = "SATech.";
+            const middle_name = "Science and Tech.";
             // we devided by 2 to make it smaller
             // Map the template coordinates to textContent objects
             return [
@@ -207,30 +197,9 @@ export default {
 
         });
 
-        // for back contents
-        const textContentsBack = computed(()=>{
-            const ecp = "CONTACT PERSON";
-            const address1 = "#354 QUEZON ST. SAN JOSE BALANGA"
-            // const barangay = "SAN JOSE"
-            // const address2 = "BALANGA BATAAN"
-            // const province = "BATAAN"
-            const ecpc = "09345678986"
-            const semester = "2nd Semester AY 2023 - 2024"
-            return [
-                {content: ecp, x:(templateCoordinates.value[0]?.textContentsBack_0_x || 310), y:(templateCoordinates.value[0]?.textContentsBack_0_y || 120) / 2,fontSize:30/2},
-                {content: address1, x:(templateCoordinates.value[0]?.textContentsBack_1_x || 280),y:(templateCoordinates.value[0]?.textContentsBack_1_y ||160)/2,fontSize:22/2},
-                // {content: barangay, x:255,y:0,fontSize:25},
-                // {content: address2, x:255,y:122,fontSize:25/2},
-                // {content: province, x:0,y:0,fontSize:0},
-                {content: ecpc, x:(templateCoordinates.value[0]?.textContentsBack_2_x ||340),y:(templateCoordinates.value[0]?.textContentsBack_2_y ||200)/2,fontSize:25/2},
-                {content: semester, x:(templateCoordinates.value[0]?.textContentsBack_3_x ||35),y:(templateCoordinates.value[0]?.textContentsBack_3_y || 500)/2,fontSize:30/2},
-            ]
-        })
-
         const updateCanvasSize = () => {
             const canvas = canvasRef.value;
-            const canvasBack = canvasBackRef.value;
-            if (canvas && canvasBack) {
+            if (canvas) {
                 // we devided by 2 to make it smaller
                 canvasWidth.value = canvas.width / 2;
                 canvasHeight.value = canvas.height / 2;
@@ -239,39 +208,26 @@ export default {
 
         const redrawCanvas = () => {
             const canvas = canvasRef.value;
-            const canvasBack = canvasBackRef.value;
             try {
-                if (canvas && canvasBack) {
+                if (canvas) {
                 const context = canvas.getContext("2d");
-                const contextBack = canvasBack.getContext("2d");
                 // we devided by 2 to make it smaller
                 const canvasWidth = canvas.width / 2;
                 const canvasHeight = canvas.height / 2;
-                // front
                 const offscreenCanvas = document.createElement("canvas");
                 const offscreenContext = offscreenCanvas.getContext("2d");
 
-                // back
-                const offscreenCanvasBack = document.createElement("canvas");
-                const offscreenContextBack = offscreenCanvas.getContext("2d");
                 // Set offscreen canvas size
                 offscreenCanvas.width = canvasWidth;
                 offscreenCanvas.height = canvasHeight;
-                    // second canvas
-                offscreenCanvasBack.width = canvasWidth;
-                offscreenCanvasBack.height = canvasHeight;
 
-                // Clear the offscreen canvas1
+                // Clear the offscreen canvas
                 offscreenContext.clearRect(0, 0, canvasWidth, canvasHeight);
-                // Clear the offscreen canvas2
-                offscreenContextBack.clearRect(0, 0, canvasWidth, canvasHeight);
 
                 // Draw the template image
                 const templateImage = new Image();
-                // draw the back
-                const backTemplateImage = new Image();
-
                 templateImage.src = collegef.value;
+
                 templateImage.onload = () => {
                     const templateAspectRatio =
                         templateImage.width / templateImage.height;
@@ -295,7 +251,7 @@ export default {
                         offsetX = (canvasWidth - drawWidth) / 2;
                     }
 
-                    // Draw the front template image on the offscreen canvas
+                    // Draw the template image on the offscreen canvas
                     offscreenContext.drawImage(
                         templateImage,
                         offsetX,
@@ -333,75 +289,8 @@ export default {
                         // Copy the offscreen canvas to the visible canvas
                         context.clearRect(0, 0, canvasWidth, canvasHeight);
                         context.drawImage(offscreenCanvas, 0, 0);
-
-                        backTemplateImage.src = collegeb.value
-
-                        backTemplateImage.onload = () => {
-                            const backTemplateAspectRatio = backTemplateImage.width / backTemplateImage.height;
-                            const canvasAspectRatio = canvasWidth / canvasHeight;
-
-                            let backDrawWidth, backDrawHeight;
-                            let backOffsetX = 0, backOffsetY = 0;
-
-                            if (backTemplateAspectRatio > canvasAspectRatio) {
-                                // Back template image is wider than the canvas
-                                backDrawWidth = canvasWidth;
-                                backDrawHeight = backDrawWidth / backTemplateAspectRatio;
-                                backOffsetY = (canvasHeight - backDrawHeight) / 2;
-                            } else {
-                                // Back template image is taller than the canvas
-                                backDrawHeight = canvasHeight;
-                                backDrawWidth = backDrawHeight * backTemplateAspectRatio;
-                                backOffsetX = (canvasWidth - backDrawWidth) / 2;
-                                // backOffsetX = 0;
-                            }
-
-                            // Draw the back template image on the second canvas
-                            offscreenContextBack.drawImage(
-                                backTemplateImage,
-                                backOffsetX,
-                                backOffsetY,
-                                backDrawWidth,
-                                backDrawHeight
-                            );
-
-                             // Draw the profile image
-                            const signatureImage = new Image();
-                            signatureImage.src = signature.value
-                            signatureImage.onload = () => {
-                                offscreenContextBack.drawImage(
-                                    signatureImage,
-                                    signatureX.value,
-                                    signatureY.value,
-                                    signatureWidth.value,
-                                    signatureHeight.value
-                                );
-
-                                // Draw the text elements
-                                if (textContentsBack.value) {
-                                    textContentsBack.value.forEach((textContent, index) => {
-                                        // console.log(textContent.content)
-                                        offscreenContextBack.font = `${textContent.fontSize}px Arial`;
-                                        contextBack.fillStyle = "black"; // Apply selection style
-                                        offscreenContextBack.fillText(
-                                        textContent.content,
-                                        textContent.x,
-                                        textContent.y
-                                        );
-                                    });
-                                }
-                                contextBack.clearRect(0, 0, canvasWidth, canvasHeight);
-                                contextBack.drawImage(offscreenCanvas, 0, 0);
-                            }
-                            
-                        
-                            // ...
-                        };
                     };
-
-                    
                 };
-                
             }
             } catch (error) {
                 console.log("no id selected")
@@ -425,14 +314,6 @@ export default {
                 height: profileHeight.value * 2,
             };
 
-            // Add signature position
-            positions.signature = {
-                x: signatureX.value,
-                y: signatureY.value,
-                with: signatureWidth.value,
-                height: signatureHeight.value,
-            }
-
             // Add text elements positions
             positions.textContents = textContents.value.map(
                 (textContent, index) => ({
@@ -443,19 +324,8 @@ export default {
                     fontSize: textContent.fontSize * 2,
                 })
             );
-
-            positions.textContentsBack = textContentsBack.value.map(
-                (textContentBack, index) => ({
-                    id: index,
-                    content: textContentBack.content,
-                    x: textContentBack.x,
-                    y: textContentBack.y * 2,
-                    fontSize: textContentBack.fontSize * 2,
-                })
-            )
             positions.templates = {
-                template: collegef.value,
-                templateBack: collegeb.value
+                template: collegef.value
             }
 
             return positions;
@@ -490,6 +360,7 @@ export default {
                 });
         };
 
+        // ...
 
         const handleExportButtonClick = () => {
             sendContentPositions();
@@ -542,45 +413,6 @@ export default {
                     break;
                 }
             }
-
-            // Check if the mouse is within the signature image on the back canvas
-            const rectBack = canvasBackRef.value.getBoundingClientRect();
-            const offsetXBack = event.clientX - rectBack.left;
-            const offsetYBack = event.clientY - rectBack.top;
-
-            if (
-                offsetXBack >= signatureX.value &&
-                offsetXBack <= signatureX.value + signatureWidth.value &&
-                offsetYBack >= signatureY.value &&
-                offsetYBack <= signatureY.value + signatureHeight.value
-            ) {
-                isDraggingBack.value = true;
-                draggedElementBack.value = "image";
-
-                startXBack.value = offsetXBack;
-                startYBack.value = offsetYBack;
-            }
-
-            // Check if the mouse is within any text element on the back canvas
-            for (let i = 0; i < textContentsBack.value.length; i++) {
-                const textContentBack = textContentsBack.value[i];
-                if (
-                    offsetXBack >= textContentBack.x &&
-                    offsetXBack <= textContentBack.x + 200 && // Assuming a maximum width of 200 for text elements
-                    offsetYBack >= textContentBack.y - textContentBack.fontSize &&
-                    offsetYBack <= textContentBack.y
-                ) {
-                    isDraggingBack.value = true;
-                    draggedElementBack.value = i;
-
-                    // Set the selected content index
-                    selectedContentIndexBack.value = i;
-
-                    startXBack.value = offsetXBack;
-                    startYBack.value = offsetYBack;
-                    break;
-                }
-            }
         };
 
         const handleMouseMove = (event) => {
@@ -630,51 +462,6 @@ export default {
                     redrawCanvas();
                 }
             }
-
-            if (isDraggingBack.value) {
-                const mouseXBack =
-                    event.clientX - canvasBackRef.value.getBoundingClientRect().left;
-                const mouseYBack =
-                    event.clientY - canvasBackRef.value.getBoundingClientRect().top;
-                const diffXBack = mouseXBack - startXBack.value;
-                const diffYBack = mouseYBack - startYBack.value;
-
-                if (draggedElementBack.value === "image") {
-                    // Update the profile image position on the back canvas
-                    signatureX.value += diffXBack;
-                    signatureY.value += diffYBack;
-                } else if (typeof draggedElementBack.value === "number") {
-                    // Update the text position on the back canvas
-                    const draggedTextContentBack = textContentsBack.value[draggedElementBack.value];
-                    draggedTextContentBack.x += diffXBack;
-                    draggedTextContentBack.y += diffYBack;
-
-                    // Check if the text element is outside the back canvas
-                    const canvasWidthBack = canvasBackRef.value.width;
-                    const canvasHeightBack = canvasBackRef.value.height;
-                    const textWidthBack = 200; // Assuming a maximum width of 200 for text elements
-
-                    if (draggedTextContentBack.x < 0) {
-                        draggedTextContentBack.x = 0;
-                    } else if (draggedTextContentBack.x + textWidthBack > canvasWidthBack) {
-                        draggedTextContentBack.x = canvasWidthBack - textWidthBack;
-                    }
-
-                    if (draggedTextContentBack.y < 0) {
-                        draggedTextContentBack.y = 0;
-                    } else if (draggedTextContentBack.y > canvasHeightBack) {
-                        draggedTextContentBack.y = canvasHeightBack;
-                    }
-                }
-
-                startXBack.value = mouseXBack;
-                startYBack.value = mouseYBack;
-
-                // Redraw the back canvas only when necessary
-                if (diffXBack !== 0 || diffYBack !== 0) {
-                    redrawCanvas();
-                }
-            }
         };
 
         const handleMouseUp = () => {
@@ -682,10 +469,6 @@ export default {
             draggedElement.value = null;
             // new added
             selectedContentIndex.value = null; // Clear the selected content index
-
-            isDraggingBack.value = false;
-            draggedElementBack.value = null;
-            selectedContentIndexBack.value = null; // Clear the selected content index for the back canvas
         };
 
         const getImageTemplates = async () => {
@@ -702,33 +485,17 @@ export default {
         const handleImageClick = async (src) => {
             console.log(src)
             collegef.value = src
-            // collegeb.value 
-            handleBack(src)
-            // get template coordinates when iclicked
-            getTemplateCoordinates(src)
-            // save it to local storage
-            localStorage.setItem('active_id',src)
-        }
-        // back id map
-        const handleBack = async (src) => {
-           collegeb.value = src.replace('f','b')
-            console.log(collegeb.value)
         }
 
         // get template contents coordinates
-        const getTemplateCoordinates = async(src) => {
+        const getTemplateCoordinates = async() => {
             try {
-                const activeTemplate = {activeTemplate:src} 
-                const response = await axios.get("/api/image-templates-coord", {params: activeTemplate});
+                const response = await axios.get("/api/image-templates-coord");
                 templateCoordinates.value = response.data;
                 profileX.value = templateCoordinates.value[0]?.profile_x / 2 || 55 / 2
                 profileY.value = templateCoordinates.value[0]?.profile_y / 2 || 87 / 2
 
-                signatureX.value = templateCoordinates.value[0]?.signature_x || (240+64.02)
-                signatureY.value = templateCoordinates.value[0]?.signature_y || 75
-
-
-                console.log(templateCoordinates.value);
+                // console.log(templateCoordinates.value);
             } catch (error) {
                 console.error(error);
             }
@@ -736,24 +503,13 @@ export default {
 
         onMounted(() => {
             getImageTemplates();
-            getTemplateCoordinates('id_template/collegef.png');
+            getTemplateCoordinates();
             const canvas = canvasRef.value;
             if (canvas) {
                 canvas.addEventListener("mousedown", handleMouseDown);
                 canvas.addEventListener("mousemove", handleMouseMove);
                 canvas.addEventListener("mouseup", handleMouseUp);
                 canvas.addEventListener("mouseleave", handleMouseUp);
-                redrawCanvas();
-
-                // Update canvas size after mounted
-                updateCanvasSize();
-            }
-            const canvasBack = canvasBackRef.value;
-            if (canvasBack) {
-                canvasBack.addEventListener("mousedown", handleMouseDown);
-                canvasBack.addEventListener("mousemove", handleMouseMove);
-                canvasBack.addEventListener("mouseup", handleMouseUp);
-                canvasBack.addEventListener("mouseleave", handleMouseUp);
                 redrawCanvas();
 
                 // Update canvas size after mounted
@@ -769,7 +525,6 @@ export default {
             handleExportButtonClick,
             // saveCanvasAsImage,
             canvasRef,
-            canvasBackRef,
             canvasWidth: 1011,
             canvasHeight: 638,
             imageTemplates,
@@ -800,8 +555,9 @@ export default {
 } */
 /* Main container */
 .main-container {
-  width: 80%;
+  width: 85%;
   margin: auto;
+  margin-left: 14rem;
   padding-top: 1rem;
 }
 /* Design for dashboard header */
@@ -875,7 +631,6 @@ div.dashboard_header {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 13rem;
     color: white;
     border: none;
     border-radius: 5px;
@@ -911,7 +666,7 @@ div.dashboard_header {
 }
 
 .short-input {
-  width: 100%;
+  width: 50%;
 }
 
 .upload_section {
@@ -948,7 +703,15 @@ div.dashboard_header {
   padding: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+.uploaded_file {
+    position: relative;
+}
 
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
 @media screen and (max-width: 1480px) {
     .generate-id-button {
         max-width: 100% !important;

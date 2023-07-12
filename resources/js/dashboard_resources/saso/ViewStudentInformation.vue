@@ -160,21 +160,6 @@
                                     <label
                                         for="recipient-name"
                                         class="col-form-label fw-bold"
-                                        >Suffix</label
-                                    >
-                                    <br />
-                                    <label
-                                        for="recipient-name"
-                                        class="col-form-label"
-                                        >{{ responseData.suffix }}</label
-                                    >
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="mb-3">
-                                    <label
-                                        for="recipient-name"
-                                        class="col-form-label fw-bold"
                                         >Course</label
                                     >
                                     <br />

@@ -221,13 +221,14 @@
           <div class="row">
             <div class="col">
               <label for="col-form-label" class="fw-bold">What are your plans for the immediate future?: </label>
-              <select id="birth_order" class="form-select mb-3" @change="toggleOtherInput">
+              <select id="future_plan_select" class="form-select mb-3" @change="toggleFuturePlan">
                                 <option value="">Continue education</option>
                                 <option value="">Work</option>
                                 <option value="">Start a Family</option>
                                 <option value="">Health issues prevents working</option>
-                                <option value="">Others</option>
+                                <option value="future_plan_option ">Others, please specify</option>
               </select>
+              <input type="text" id="" v-if="show_future_plan" v-model="future_plan_model" class="form-control" placeholder="Please specify">
            </div>
           </div>
           <div class="row">
@@ -277,6 +278,23 @@
 
 <script>
 export default {
+  data(){
+    return{
+
+    // What are your plans for the immediate future?:
+    show_future_plan:false,
+    future_plan_model: '',
+
+    }
+  },
+
+  methods:{
+    toggleFuturePlan(){
+      this.show_future_plan = document.getElementById("future_plan_select").value === "future_plan_option ";
+    }
+
+  }
+   
 
 };
 </script>
